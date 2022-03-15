@@ -28,30 +28,34 @@ def get_frames():
 
 
 def capture_image(img):
-    print('interval')
-    prev_image_date = datetime.now()
     date = str(datetime.timestamp(datetime.now()))
     file_name = date.replace(".", "_")
     saved_image = Image.fromarray(img, 'RGB')
     saved_image.save(f"images/{file_name}.png")
 
 
+def calculate_time_difference(base_time):
+    current_time = datetime.now()
+    time_difference = (current_time - base_time).total_seconds()
+    return time_difference
+
+
 def generate_frames():
-    captured = False
-    prev_image_date = datetime.now()
+    prev_image_date = datetime.min
+    print(prev_image_date < datetime.now())
 
     while True:
         frame, has_face, img = get_frames()
         if has_face:
-            if not captured:
-                capture_image(img)
-                captured = True
-            current_date = datetime.now()
-            time_difference = (current_date - prev_image_date).total_seconds()
+            time_difference = calculate_time_difference(prev_image_date)
             if time_difference >= 10:
                 capture_image(img)
+                print('image captured')
+                prev_image_date = datetime.now()
         else:
-            captured = False
+            time_difference = calculate_time_difference(prev_image_date)
+            if time_difference >= 10:
+                prev_image_date = datetime.min
 
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
