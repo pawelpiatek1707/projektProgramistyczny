@@ -1,9 +1,11 @@
-from flask import Flask, render_template, Response, send_file
+from flask import Flask, render_template, Response, send_file, jsonify
 import cv2
 from datetime import datetime, date
 from PIL import Image
 import glob
 import os
+import io
+import base64
 
 app = Flask(__name__)
 camera = cv2.VideoCapture(0)
@@ -86,20 +88,27 @@ def video():
 def test():
     files = []
     for file in glob.glob('static/*.png'):
-        files.append(file)
-    test_file = ''
-    if len(files) > 0:
-        test_file = files[0]
-    print(test_file)
-    split_image_name = test_file.split('\\')
-    print('split: ', split_image_name)
-    return render_template('images.html', images=files)
+        name = file.split('\\')[1].split('.')[0]
+        img = Image.open(file, mode='r')
+        img_byte_arr = io.BytesIO()
+        img.save(img_byte_arr, format='PNG')
+        my_encoded_img = base64.encodebytes(img_byte_arr.getvalue()).decode('utf-8').replace('\n', '')
+        response_data = {"name": name, "image": my_encoded_img}
+        files.append(response_data)
+    return jsonify(files)
 
 
 @app.route('/images/<name>')
 def get_image(name):
     filename = f"static/{name}.png"
-    return send_file(filename, mimetype='image/png')
+    img = Image.open(filename, mode='r')
+    img_byte_arr = io.BytesIO()
+    img.save(img_byte_arr, format='PNG')
+    my_encoded_img = base64.encodebytes(img_byte_arr.getvalue()).decode('utf-8').replace('\n', '')
+    response_data = {"name": name, "image": my_encoded_img}
+
+    return jsonify(response_data)
+
 
 
 @app.route('/images/<name>', methods=['DELETE'])
