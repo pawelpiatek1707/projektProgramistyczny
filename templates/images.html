@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Index</title>
+    <link rel="stylesheet" href="../static/css/images.css">
+</head>
+<body>
+<div class="wrapper">
+    <h1>Images</h1>
+    <div class="images">
+        {% for image in images %}
+        <img src="{{ image }}" alt="User Image">
+        {% endfor %}
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,15 +1,24 @@
 <!DOCTYPE html>
 <html>
-
-
-  <body>
+<head>
+    <meta charset="UTF-8">
+    <title>CCTV</title>
+    <link rel="stylesheet" href="../static/css/cctv.css">
+</head>
+<body>
+<div class="wrapper">
     <h1>Live streaming</h1>
-    <div>
-
-        <img src="{{ url_for('video') }}" width="50%"/>
+    <div class="content">
+        <div class="video">
+            <img src="{{ url_for('video') }}" width="100%"/>
+        </div>
+        <div class="data">
+            <h2>General information</h2>
+            <p>Date: {{date}}</p>
+        </div>
     </div>
 
-    </body>
+</div>
 
-
+</body>
 </html>

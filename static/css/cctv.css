@@ -1,0 +1,68 @@
+  html {
+    box-sizing: border-box;
+    font-size: 62.5%;
+
+    @media(max-width: ${variables.breakpoints.md}) {
+      font-size: 56.25%;
+    }
+    @media(max-width: ${variables.breakpoints.sm}) {
+      font-size: 50%;
+    }
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+  }
+  body {
+    width: 100%;
+    margin: 0;
+  }
+  p {
+    font-size: 16px;
+  }
+  ul {
+    padding: 0;
+    margin: 0;
+  }
+
+.wrapper {
+    background : #30336b;
+    height: 100vh;
+    padding: 40px
+}
+
+.wrapper h1 {
+    width: 100%;
+    margin-top: 0;
+    color: #eee;
+    font-size: 28px;
+    padding: 16px;
+}
+
+.content {
+    display: flex;
+}
+
+.video {
+    width: 600px;
+    height: 600px;
+}
+
+.data {
+    margin-left: 40px;
+    background: #686de0;
+    height: 400px;
+    padding: 16px;
+    width: 600px;
+}
+
+.data h2 {
+    color: #eee;
+    font-size: 24px;
+}
+
+.data p {
+    color: #eee;
+}
