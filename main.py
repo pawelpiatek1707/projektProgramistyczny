@@ -5,7 +5,8 @@ import os
 from datetime import datetime, date
 import cv2
 from PIL import Image
-from flask import Flask, render_template, Response, jsonify, make_response
+from flask import Flask, render_template, Response, jsonify, make_response, request
+
 
 app = Flask(__name__)
 app.config['CORS_HEADERS'] = "Content-Type"
@@ -88,47 +89,73 @@ def video():
 
 @app.route('/images')
 def test():
-    files = []
-    for file in glob.glob('static/*.png'):
-        name = file.split('\\')[1].split('.')[0]
-        img = Image.open(file, mode='r')
-        img_byte_arr = io.BytesIO()
-        img.save(img_byte_arr, format='PNG')
-        my_encoded_img = base64.encodebytes(img_byte_arr.getvalue()).decode('utf-8').replace('\n', '')
-        response_data = {"name": name, "image": my_encoded_img}
-        files.append(response_data)
-    response = jsonify(files)
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    return response
+    basic_token = request.headers['Authorization'].split(' ')[1]
+    if basic_token == 'cHJvamVrdDpwcm9ncmFtaXN0eWN6bnk=':
+        files = []
+        for file in glob.glob('static/*.png'):
+            name = file.split('\\')[1].split('.')[0]
+            img = Image.open(file, mode='r')
+            img_byte_arr = io.BytesIO()
+            img.save(img_byte_arr, format='PNG')
+            my_encoded_img = base64.encodebytes(img_byte_arr.getvalue()).decode('utf-8').replace('\n', '')
+            response_data = {"name": name, "image": my_encoded_img}
+            files.append(response_data)
+        response = jsonify(files)
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response
+    else:
+        message = 'Failed to delete image'
+        response = jsonify({"message": message})
+        return response, 500
 
 
-@app.route('/images/<name>')
-def get_image(name):
-    filename = f"static/{name}.png"
-    img = Image.open(filename, mode='r')
-    img_byte_arr = io.BytesIO()
-    img.save(img_byte_arr, format='PNG')
-    my_encoded_img = base64.encodebytes(img_byte_arr.getvalue()).decode('utf-8').replace('\n', '')
-    response_data = {"name": name, "image": my_encoded_img}
 
-    return jsonify(response_data)
+# @app.route('/images/<name>')
+# def get_image(name):
+#     filename = f"static/{name}.png"
+#     img = Image.open(filename, mode='r')
+#     img_byte_arr = io.BytesIO()
+#     img.save(img_byte_arr, format='PNG')
+#     my_encoded_img = base64.encodebytes(img_byte_arr.getvalue()).decode('utf-8').replace('\n', '')
+#     response_data = {"name": name, "image": my_encoded_img}
+#
+#     return jsonify(response_data)
 
 
 @app.route('/images/<name>', methods=['DELETE'])
 def del_image(name):
+    basic_token = request.headers['Authorization'].split(' ')[1]
+    if basic_token == 'cHJvamVrdDpwcm9ncmFtaXN0eWN6bnk=':
+        file_path = f"static/{name}.png"
+        response = make_response()
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add('Access-Control-Allow-Headers', "*")
+        response.headers.add('Access-Control-Allow-Methods', "*")
 
-    file_path = f"static/{name}.png"
-    response = make_response()
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    response.headers.add('Access-Control-Allow-Headers', "*")
-    response.headers.add('Access-Control-Allow-Methods', "*")
-
-    try:
-        os.remove(file_path)
-        message = 'Image deleted successfully'
+        try:
+            os.remove(file_path)
+            message = 'Image deleted successfully'
+            response = jsonify({"message": message})
+            return response, 200
+        except OSError:
+            message = 'Failed to delete image'
+            response = jsonify({"message": message})
+            return response, 500
+    else:
+        message = 'Failed to delete image'
         response = jsonify({"message": message})
+        return response, 500
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    if data['username'] and data['password']:
+        basic_token = base64.b64encode(bytes(f"{data['username']}:{data['password']}", "utf-8")).decode("ascii")
+        message = 'Image deleted successfully'
+        response = jsonify({"message": message, "basic": basic_token})
         return response, 200
-    except OSError:
+    else:
         message = 'Failed to delete image'
         response = jsonify({"message": message})
         return response, 500
