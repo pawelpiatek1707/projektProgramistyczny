@@ -7,18 +7,11 @@
 </head>
 <body>
 <div class="wrapper">
-    <h1>Live streaming</h1>
     <div class="content">
-        <div class="video">
-            <img src="{{ url_for('video') }}" width="100%"/>
-        </div>
-        <div class="data">
-            <h2>General information</h2>
-            <p>Date: {{date}}</p>
+        <div style="display: flex; justify-items: center; width: 100%">
+            <img src="{{ url_for('video') }}" width="50%"/>
         </div>
     </div>
-
 </div>
-
 </body>
 </html>

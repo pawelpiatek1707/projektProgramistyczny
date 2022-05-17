@@ -1,13 +1,15 @@
-from flask import Flask, render_template, Response, send_file, jsonify
-import cv2
-from datetime import datetime, date
-from PIL import Image
-import glob
-import os
-import io
 import base64
+import glob
+import io
+import os
+from datetime import datetime, date
+import cv2
+from PIL import Image
+from flask import Flask, render_template, Response, jsonify, make_response
 
 app = Flask(__name__)
+app.config['CORS_HEADERS'] = "Content-Type"
+app.config['CORS_RESOURCES'] = {r"/api/*": {"origins": "*"}}
 camera = cv2.VideoCapture(0)
 
 face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_alt2.xml")
@@ -95,7 +97,9 @@ def test():
         my_encoded_img = base64.encodebytes(img_byte_arr.getvalue()).decode('utf-8').replace('\n', '')
         response_data = {"name": name, "image": my_encoded_img}
         files.append(response_data)
-    return jsonify(files)
+    response = jsonify(files)
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 
 @app.route('/images/<name>')
@@ -110,19 +114,24 @@ def get_image(name):
     return jsonify(response_data)
 
 
-
 @app.route('/images/<name>', methods=['DELETE'])
 def del_image(name):
 
     file_path = f"static/{name}.png"
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add('Access-Control-Allow-Headers', "*")
+    response.headers.add('Access-Control-Allow-Methods', "*")
 
     try:
         os.remove(file_path)
         message = 'Image deleted successfully'
-        return Response(message, status=200, mimetype='application/json')
+        response = jsonify({"message": message})
+        return response, 200
     except OSError:
         message = 'Failed to delete image'
-        return Response(message, status=500, mimetype='application/json')
+        response = jsonify({"message": message})
+        return response, 500
 
 
 if __name__ == "__main__":
