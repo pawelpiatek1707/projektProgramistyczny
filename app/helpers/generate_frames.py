@@ -1,7 +1,7 @@
 from datetime import datetime
-from helpers.get_frames import get_frames
-from helpers.calculate_time_difference import calculate_time_difference
-from helpers.capture_image import capture_image
+from app.helpers.get_frames import get_frames
+from app.helpers.calculate_time_difference import calculate_time_difference
+from app.helpers.capture_image import capture_image
 
 
 def generate_frames():

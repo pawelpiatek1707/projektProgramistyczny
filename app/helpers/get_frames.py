@@ -2,6 +2,8 @@ import cv2
 camera = cv2.VideoCapture(0)
 face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_alt2.xml")
 ds_factor = 0.6
+
+
 def get_frames():
     ret, frame = camera.read()
 
