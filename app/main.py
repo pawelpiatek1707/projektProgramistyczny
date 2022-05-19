@@ -12,8 +12,6 @@ from helpers.generate_frames import generate_frames
 app = Flask(__name__)
 swagger = Swagger(app)
 
-upload_directory = 'static/images'
-
 
 @app.route('/')
 def cctv():
