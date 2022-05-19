@@ -4,11 +4,13 @@ import io
 import os
 from datetime import date
 from PIL import Image
+from flasgger import Swagger
 from flask import Flask, render_template, Response, jsonify, make_response, request
 from helpers.generate_frames import generate_frames
 
 
 app = Flask(__name__)
+swagger = Swagger(app)
 
 upload_directory = 'static/images'
 
@@ -27,6 +29,24 @@ def video():
 
 @app.route('/images')
 def test():
+    """
+       Endpoint returning a list of captured images
+       ---
+       responses:
+         401:
+           description: Authorization failed!
+         200:
+           description: Images list
+           schema:
+              type: array
+              items:
+                  type: object
+                  properties:
+                      name:
+                          type: string
+                      image:
+                          type: string
+       """
     basic_token = request.headers['Authorization'].split(' ')[1]
     if basic_token == 'cHJvamVrdDpwcm9ncmFtaXN0eWN6bnk=':
         files = []
@@ -49,6 +69,26 @@ def test():
 
 @app.route('/images/<name>', methods=['DELETE'])
 def del_image(name):
+    """
+     Endpoint for deleting image
+     ---
+     parameters:
+        - name: name
+          type: string
+          required: true
+     responses:
+       401:
+         description: Authorization failed!
+       500:
+         description: Internal server error
+       200:
+         description: Deleted successfully
+         schema:
+            type: object
+            properties:
+                message:
+                    type: string
+     """
     basic_token = request.headers['Authorization'].split(' ')[1]
     if basic_token == 'cHJvamVrdDpwcm9ncmFtaXN0eWN6bnk=':
         file_path = f"static/{name}.png"
@@ -74,6 +114,29 @@ def del_image(name):
 
 @app.route('/login', methods=['POST'])
 def login():
+    """
+        Endpoint for authentication
+        ---
+        parameters:
+           - name: username
+             type: string
+             required: true
+           - name: password
+             type: string
+             required: true
+        responses:
+          401:
+            description: Authentication failed!
+          200:
+            description: Authentication success
+            schema:
+               type: object
+               properties:
+                   message:
+                       type: string
+                   basic:
+                       type: string
+        """
     data = request.json
     if data['username'] and data['password']:
         basic_token = base64.b64encode(bytes(f"{data['username']}:{data['password']}", "utf-8")).decode("ascii")
