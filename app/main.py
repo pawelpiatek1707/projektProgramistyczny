@@ -138,7 +138,7 @@ def login():
     data = request.json
     if data['username'] and data['password']:
         basic_token = base64.b64encode(bytes(f"{data['username']}:{data['password']}", "utf-8")).decode("ascii")
-        message = 'Image deleted successfully'
+        message = 'Authorization success'
         response = jsonify({"message": message, "basic": basic_token})
         return response, 200
     else:
