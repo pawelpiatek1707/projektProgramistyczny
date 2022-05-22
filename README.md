@@ -36,4 +36,8 @@ Additionally, the application provides 3 endpoints.
 
 ## Getting started
 
+Inside project directory run:
+
+pip install -r requirements.txt
+
 python main.py
